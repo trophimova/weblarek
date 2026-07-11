@@ -14,11 +14,20 @@ export interface IProduct {
   description: string;
 }
 
+export type TPayment = 'online' | 'offline';
+
 export interface IBuyer {
-  payment: 'online' | 'offline' | '';
+  payment: TPayment | '';
   address: string;
   email: string;
   phone: string;
+}
+
+export interface IBuyerErrors {
+  payment?: string;
+  address?: string;
+  email?: string;
+  phone?: string;
 }
 
 export interface IProductsResponse {
@@ -27,7 +36,7 @@ export interface IProductsResponse {
 }
 
 export interface IOrder extends Omit<IBuyer, 'payment'> {
-  payment: 'online' | 'offline';
+  payment: TPayment;
   total: number;
   items: string[];
 }

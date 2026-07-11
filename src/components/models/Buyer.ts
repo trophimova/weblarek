@@ -1,7 +1,7 @@
-import { IBuyer } from '../../types';
+import { IBuyer, TPayment, IBuyerErrors } from '../../types';
 
 export class Buyer {
-  private payment: 'online' | 'offline' | '';
+  private payment: TPayment | '';
   private address: string;
   private email: string;
   private phone: string;
@@ -47,8 +47,8 @@ export class Buyer {
     this.phone = '';
   }
 
-  validateBuyerData(): Partial<Record<keyof IBuyer, string>> {
-    const errors: Partial<Record<keyof IBuyer, string>> = {};
+  validateBuyerData(): IBuyerErrors {
+    const errors: IBuyerErrors = {};
 
     if (!this.payment) {
       errors.payment = 'Не выбран способ оплаты';

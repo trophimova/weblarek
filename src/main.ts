@@ -1,4 +1,5 @@
 import './scss/styles.scss';
+import { API_URL } from './utils/constants'
 
 import { apiProducts } from './utils/data';
 import { ProductCatalog } from './components/models/ProductCatalog';
@@ -6,7 +7,7 @@ import { Basket } from './components/models/Basket';
 import { Buyer } from './components/models/Buyer';
 
 import { Api } from './components/base/Api';
-import { WebLarekApi } from './components/base/WebLarekApi';
+import { WebLarekApi } from './components/service/WebLarekApi';
 
 // Проверка модели каталога товаров
 const productCatalog = new ProductCatalog();
@@ -92,7 +93,7 @@ console.log('Ошибки после заполнения всех полей:',
 buyer.clearBuyerData();
 console.log('Данные покупателя после очистки:', buyer.getBuyerData());
 
-const api = new Api(`${import.meta.env.VITE_API_ORIGIN}/api/weblarek`);
+const api = new Api(API_URL);
 const webLarekApi = new WebLarekApi(api);
 
 webLarekApi
