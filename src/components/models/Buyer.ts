@@ -1,4 +1,4 @@
-import { IBuyer, TPayment, IBuyerErrors } from '../../types';
+import { IBuyer, TPayment, IErrorsBuyer } from '../../types';
 
 export class Buyer {
   private payment: TPayment | '';
@@ -47,8 +47,8 @@ export class Buyer {
     this.phone = '';
   }
 
-  validateBuyerData(): IBuyerErrors {
-    const errors: IBuyerErrors = {};
+  validateBuyerData(): IErrorsBuyer {
+    const errors: IErrorsBuyer = {};
 
     if (!this.payment) {
       errors.payment = 'Не выбран способ оплаты';
