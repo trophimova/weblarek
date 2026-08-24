@@ -5,11 +5,6 @@ import { IBuyer, TPayment } from '../../types';
 
 type IOrderForm = IForm & Pick<IBuyer, 'address' | 'payment'>;
 
-const paymentMap: Record<TPayment, string> = {
-  online: 'card',
-  offline: 'cash'
-};
-
 export class Order extends Form<IOrderForm> {
   protected paymentButtons: HTMLButtonElement[];
   protected addressInput: HTMLInputElement;
@@ -24,15 +19,12 @@ export class Order extends Form<IOrderForm> {
 
     this.paymentButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const payment = (Object.keys(paymentMap) as TPayment[])
-          .find((key) => paymentMap[key] === button.name);
+        const payment = button.name as TPayment;
 
-        if (payment) {
-          this.events.emit('form:change', {
-            field: 'payment',
-            value: payment
-          });
-        }
+        this.events.emit('form:change', {
+          field: 'payment',
+          value: payment
+        });
       });
     });
 
@@ -50,7 +42,7 @@ export class Order extends Form<IOrderForm> {
     this.paymentButtons.forEach((button) => {
       button.classList.toggle(
         'button_alt-active',
-        value !== '' && button.name === paymentMap[value]
+        button.name === value
       );
     });
   }

@@ -14,7 +14,7 @@ export interface IProduct {
   description: string;
 }
 
-export type TPayment = 'online' | 'offline';
+export type TPayment = 'card' | 'cash';
 
 export interface IBuyer {
   payment: TPayment | '';

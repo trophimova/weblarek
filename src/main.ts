@@ -46,8 +46,17 @@ const cardCatalogTemplate = ensureElement<HTMLTemplateElement>('#card-catalog');
 const gallery = new Gallery(galleryElement);
 
 const cardPreviewTemplate = ensureElement<HTMLTemplateElement>('#card-preview');
+const cardPreviewElement = cloneTemplate<HTMLElement>(cardPreviewTemplate);
+const cardPreview = new CardPreview(cardPreviewElement,
+  {
+    onClick: () => {
+      eventEmitter.emit('product:action');
+    }
+  }
+);
+
 const modalElement = ensureElement<HTMLElement>('#modal-container');
-const modal = new Modal(eventEmitter, modalElement);
+const modal = new Modal(modalElement);
 
 const headerElement = ensureElement<HTMLElement>('.header');
 const header = new Header(eventEmitter, headerElement);
@@ -113,23 +122,6 @@ eventEmitter.on('preview:changed', () => {
   }
 
   const inBasket = basket.hasItem(product.id);
-  const cardElement = cloneTemplate<HTMLElement>(cardPreviewTemplate);
-  const cardPreview = new CardPreview(cardElement,
-    {
-      onClick: () => {
-        if (inBasket) {
-          eventEmitter.emit('product:remove', {
-            id: product.id
-          });
-        } else {
-          eventEmitter.emit('product:add', {
-            id: product.id
-          });
-        }
-      }
-    }
-  );
-
   let buttonText: string;
   let buttonDisabled: boolean;
 
@@ -161,29 +153,20 @@ eventEmitter.on('preview:changed', () => {
   modal.open();
 });
 
-eventEmitter.on('modal:close', () => {
-  modal.close();
-});
+eventEmitter.on('product:action', () => {
+  const product = productCatalog.getPreview();
 
-eventEmitter.on<{ id: string }>('product:add', ({ id }) => {
-  const product = productCatalog.getProductById(id);
-
-  if (product) {
-    if (!basket.hasItem(id)) {
-      basket.addItem(product);
-    }
-
-    modal.close();
+  if (!product) {
+    return;
   }
-});
 
-eventEmitter.on<{ id: string }>('product:remove', ({ id }) => {
-  const product = productCatalog.getProductById(id);
-
-  if (product) {
+  if (basket.hasItem(product.id)) {
     basket.removeItem(product);
-    modal.close();
+  } else {
+    basket.addItem(product);
   }
+
+  modal.close();
 });
 
 eventEmitter.on<{ id: string }>('basket:remove', ({ id }) => {
@@ -231,16 +214,6 @@ eventEmitter.on('basket:changed', () => {
 });
 
 eventEmitter.on('basket:open', () => {
-  const items = basket.getItems();
-
-  if (items.length === 0) {
-    basketView.render({
-      items: [],
-      total: basket.getTotalPrice(),
-      buttonDisabled: true
-    });
-  }
-
   modal.render({
     content: basketView.render()
   });
@@ -249,22 +222,8 @@ eventEmitter.on('basket:open', () => {
 });
 
 eventEmitter.on('order:open', () => {
-  const buyerData = buyer.getBuyerData();
-  const errors = buyer.validateBuyerData();
-
-  const orderErrors = [errors.payment, errors.address]
-    .filter(Boolean)
-    .join(', ');
-
-  const orderElement = orderView.render({
-    payment: buyerData.payment,
-    address: buyerData.address,
-    valid: !errors.payment && !errors.address,
-    errors: orderErrors
-  });
-
   modal.render({
-    content: orderElement
+    content: orderView.render()
   });
 
   modal.open();
@@ -304,22 +263,8 @@ eventEmitter.on('buyer:changed', () => {
 });
 
 eventEmitter.on('order:submit', () => {
-  const buyerData = buyer.getBuyerData();
-  const errors = buyer.validateBuyerData();
-
-  const contactsErrors = [errors.email, errors.phone]
-    .filter(Boolean)
-    .join(', ');
-
-  const contactsElement = contactsView.render({
-    email: buyerData.email,
-    phone: buyerData.phone,
-    valid: !errors.email && !errors.phone,
-    errors: contactsErrors
-  });
-
   modal.render({
-    content: contactsElement
+    content: contactsView.render()
   });
 });
 
